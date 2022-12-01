@@ -670,6 +670,8 @@ make_join_rel(PlannerInfo *root, RelOptInfo *rel1, RelOptInfo *rel2)
 	RelOptInfo *joinrel;
 	List	   *restrictlist;
 
+	root->make_join_rel_count++;
+
 	/* We should never try to join two overlapping sets of rels. */
 	Assert(!bms_overlap(rel1->relids, rel2->relids));
 

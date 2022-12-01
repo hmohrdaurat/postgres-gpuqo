@@ -89,6 +89,9 @@ typedef struct PlannedStmt
 
 	Node	   *utilityStmt;	/* non-null if this is utility stmt */
 
+	List *candidatePaths;
+	int numJoins;
+
 	/* statement location in source string (copied from Query) */
 	int			stmt_location;	/* start location, or -1 if unknown */
 	int			stmt_len;		/* length in bytes; 0 means "rest of string" */

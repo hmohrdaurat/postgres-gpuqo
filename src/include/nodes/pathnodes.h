@@ -360,6 +360,8 @@ struct PlannerInfo
 
 	/* Does this query modify any partition key columns? */
 	bool		partColsUpdated;
+
+	int make_join_rel_count;
 };
 
 

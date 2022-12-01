@@ -509,6 +509,9 @@ standard_planner(Query *parse, int cursorOptions, ParamListInfo boundParams)
 	/* build the PlannedStmt result */
 	result = makeNode(PlannedStmt);
 
+	result->candidatePaths = final_rel->pathlist;
+	result->numJoins = root->make_join_rel_count;
+
 	result->commandType = parse->commandType;
 	result->queryId = parse->queryId;
 	result->hasReturning = (parse->returningList != NIL);
@@ -634,6 +637,7 @@ subquery_planner(PlannerGlobal *glob, Query *parse,
 		root->wt_param_id = -1;
 	root->non_recursive_path = NULL;
 	root->partColsUpdated = false;
+	root->make_join_rel_count = 0;
 
 	/*
 	 * If there is a WITH list, process each WITH query and either convert it
