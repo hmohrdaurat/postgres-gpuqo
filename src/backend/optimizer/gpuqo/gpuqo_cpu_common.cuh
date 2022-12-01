@@ -80,13 +80,20 @@ public:
 		join = _join;
 
 #ifdef GPUQO_PRINT_N_JOINS
-		n_joins = 0;
+		n_joins = idp_current_iterations;
 		n_checks = 0;
 #endif
 	}
 
 	virtual bool check_join(int level, JoinRelationCPU<BitmapsetN> &left_rel,
-			JoinRelationCPU<BitmapsetN> &right_rel) {return true;}
+			JoinRelationCPU<BitmapsetN> &right_rel) {				
+#ifdef GPUQO_PRINT_N_JOINS
+			if(qo_max_iterations > 0 && n_joins >= qo_max_iterations) {
+				return false;
+			}
+#endif
+			return true;
+	}
 
 	virtual void post_join(int level,  bool new_rel, 		
 		   JoinRelationCPU<BitmapsetN> &join_rel,
@@ -95,6 +102,7 @@ public:
 	{
 #ifdef GPUQO_PRINT_N_JOINS
 		n_joins++;
+		idp_current_iterations++;
 #endif
 	}
 

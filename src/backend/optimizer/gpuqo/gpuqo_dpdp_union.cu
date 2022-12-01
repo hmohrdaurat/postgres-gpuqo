@@ -293,8 +293,9 @@ QueryTree<BitmapsetOuter> *gpuqo_run_dpdp_union_rec(int gpuqo_algo,
 	GpuqoPlannerInfo<BitmapsetInner> *new_info = remapper.remapPlannerInfo(info);
 	
 	new_info->n_iters = min(new_info->n_rels, n_iters);
+	//new_info->n_iters = min(new_info->n_rels, idp_max_iterations);
 
-	if (new_info->n_rels == new_info->n_iters){
+	if (new_info->n_rels == new_info->n_iters || (idp_max_iterations > 0 && idp_current_iterations >= idp_max_iterations)){
 		printf("\n f(x): gpuqo_run_dpdp_union_rec => -----INSIDE TERMINATION CHECK ----- LEVEL %d \n", level_of_dp);
 		QueryTree<BitmapsetOuter> *out_qt = gpuqo_run_dpdp_union_dp<BitmapsetOuter, BitmapsetInner>(gpuqo_algo, info, remap_list);
 		freeGpuqoPlannerInfo(new_info);
@@ -421,8 +422,6 @@ QueryTree<BitmapsetOuter> *gpuqo_run_dpdp_union_rec(int gpuqo_algo,
 	std::cout << "Sum of OPTIMIZED Disjoint Set Cost: " << total_optimized_cost << std::endl;
 	std::cout << "Total REDUCTED Disjoint Set Cost: " << total_unoptimized_union_cost - total_optimized_cost << std::endl;
 
-
-
 	printf("\n f(x): gpuqo_run_dpdp_union_rec => recursing ----- CHECK 4 ----- LEVEL %d \n", level_of_dp);
 	QueryTree<BitmapsetInner> *res_qt;
 	if (BitmapsetInner::SIZE == 32 || next_remap_list.size() < 32) {
@@ -449,6 +448,8 @@ QueryTree<BitmapsetN> *gpuqo_run_dpdp_union(int gpuqo_algo,
 									GpuqoPlannerInfo<BitmapsetN>* info,
 									int n_iters)
 {
+	idp_current_iterations = 0;
+
 	printf("\n\tSTART of UnionDP\n\n");
 	printf("\n f(x): gpu_run_dpdp_union \n");
 	list<remapper_transf_el_t<BitmapsetN> > remap_list;

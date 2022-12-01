@@ -76,6 +76,11 @@ public:
                     JoinRelationCPU<BitmapsetN> &left_rel,             
                     JoinRelationCPU<BitmapsetN> &right_rel)
     {
+#ifdef GPUQO_PRINT_N_JOINS
+        if(qo_max_iterations > 0 && CPUAlgorithm<BitmapsetN, memo_t>::n_checks >= qo_max_iterations) {
+            return false;
+        }
+#endif
         return (is_disjoint_rel(left_rel, right_rel) 
             && are_connected_rel(left_rel, right_rel, CPUAlgorithm<BitmapsetN, memo_t>::info));
     }

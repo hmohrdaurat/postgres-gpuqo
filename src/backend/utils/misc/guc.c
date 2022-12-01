@@ -2126,6 +2126,26 @@ static struct config_int ConfigureNamesInt[] =
 		NULL, NULL, NULL
 	},
 	{
+		{"qo_max_iterations", PGC_USERSET, QUERY_TUNING_OTHER,
+			gettext_noop("maximum number of iterations over the join space (0: disabled)"),
+			NULL,
+			GUC_EXPLAIN
+		},
+		&qo_max_iterations,
+		0, 0, INT_MAX,
+		NULL, NULL, NULL
+	},
+	{
+		{"idp_max_iterations", PGC_USERSET, QUERY_TUNING_OTHER,
+			gettext_noop("maximum number of iterations over the join space for IDP (0: disabled)"),
+			NULL,
+			GUC_EXPLAIN
+		},
+		&idp_max_iterations,
+		0, 0, INT_MAX,
+		NULL, NULL, NULL
+	},
+	{
 		{"geqo_threshold", PGC_USERSET, QUERY_TUNING_GEQO,
 			gettext_noop("Sets the threshold of FROM items beyond which GEQO is used."),
 			NULL,

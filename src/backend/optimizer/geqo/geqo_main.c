@@ -32,6 +32,7 @@
 #include "optimizer/geqo_random.h"
 #include "optimizer/geqo_selection.h"
 
+#include "optimizer/gpuqo_common.h"
 
 /*
  * Configuration options
@@ -224,6 +225,9 @@ geqo(PlannerInfo *root, int number_of_rels, List *initial_rels)
 			print_gen(stdout, pool, generation);
 #endif
 
+		if(qo_max_iterations > 0 && root->make_join_rel_count >= qo_max_iterations) {
+			break;
+		}
 	}
 
 

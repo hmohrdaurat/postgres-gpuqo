@@ -145,6 +145,7 @@ GpuqoPlannerInfo<BitmapsetN>* convertGpuqoPlannerInfo(GpuqoPlannerInfoC *info_c)
 	info->size = size;
 	info->n_rels = info_c->n_rels;
 	info->n_iters = info_c->n_rels; // will be overwritten by IDP
+	//info->total_iters = 0;
 
 	initGpuqoPlannerInfo(info);
 

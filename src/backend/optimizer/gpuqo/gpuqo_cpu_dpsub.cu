@@ -81,6 +81,11 @@ public:
     virtual bool check_join(int level, JoinRelationCPU<BitmapsetN> &left_rel,
         JoinRelationCPU<BitmapsetN> &right_rel)
     {
+#ifdef GPUQO_PRINT_N_JOINS
+        if(qo_max_iterations > 0 && CPUAlgorithm<BitmapsetN, memo_t>::n_checks >= qo_max_iterations) {
+            return false;
+        }
+#endif
 
         // I do not need to check self-connectedness of the single joinrels since 
         // if they were not connected, they wouldn't have been generated and 

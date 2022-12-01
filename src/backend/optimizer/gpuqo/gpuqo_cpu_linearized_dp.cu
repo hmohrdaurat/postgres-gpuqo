@@ -54,6 +54,9 @@ template<typename BitmapsetN>
 QueryTree<BitmapsetN>*
 gpuqo_cpu_linearized_dp(GpuqoPlannerInfo<BitmapsetN> *orig_info)
 {
+#ifdef GPUQO_PROFILE
+    uint64_t previous_job_count = idp_current_iterations;
+#endif
     QueryTree<BitmapsetN> *ikkbz_qt = gpuqo_cpu_ikkbz(orig_info);
     
     list<remapper_transf_el_t<BitmapsetN> > remap_list;
@@ -91,6 +94,12 @@ gpuqo_cpu_linearized_dp(GpuqoPlannerInfo<BitmapsetN> *orig_info)
                     continue;
                 
                 if (are_connected_ids(l->id, r->id, info)) {
+    #ifdef GPUQO_PROFILE
+                    idp_current_iterations++;
+                    if(qo_max_iterations > 0 && idp_current_iterations >= qo_max_iterations) {
+                        goto early_exit;
+                    }
+    #endif 
                     JoinRelationCPU<BitmapsetN> *p = make_join_relation(
                                                                 *l, *r, info);
                     if (T[i][i+s-1] == NULL 
@@ -101,8 +110,9 @@ gpuqo_cpu_linearized_dp(GpuqoPlannerInfo<BitmapsetN> *orig_info)
                 }
             }
         }
-
     }
+
+early_exit:
 
     QueryTree<BitmapsetN> *qt;
     build_query_tree(T[0][info->n_rels-1], &qt);
@@ -119,6 +129,8 @@ gpuqo_cpu_linearized_dp(GpuqoPlannerInfo<BitmapsetN> *orig_info)
 
     freeGpuqoPlannerInfo(info);
 	freeQueryTree(qt);
+
+    LOG_PROFILE("The algorithm did %lu joins\n", idp_current_iterations - previous_job_count);
 
     return qt_remap;
 }

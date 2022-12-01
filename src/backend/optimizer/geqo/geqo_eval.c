@@ -31,6 +31,8 @@
 #include "optimizer/paths.h"
 #include "utils/memutils.h"
 
+#include "optimizer/gpuqo_common.h"
+
 
 /* A "clump" of already-joined relations within gimme_tree */
 typedef struct
@@ -261,7 +263,6 @@ merge_clump(PlannerInfo *root, List *clumps, Clump *new_clump, int num_gene,
 			joinrel = make_join_rel(root,
 									old_clump->joinrel,
 									new_clump->joinrel);
-
 			/* Keep searching if join order is not valid */
 			if (joinrel)
 			{
@@ -294,6 +295,8 @@ merge_clump(PlannerInfo *root, List *clumps, Clump *new_clump, int num_gene,
 				 * it into the list.
 				 */
 				return merge_clump(root, clumps, old_clump, num_gene, force);
+			} else if(qo_max_iterations > 0 && root->make_join_rel_count >= qo_max_iterations) {
+				break;
 			}
 		}
 		prev = lc;

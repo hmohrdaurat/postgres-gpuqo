@@ -550,11 +550,11 @@ ExplainOnePlan(PlannedStmt *plannedstmt, IntoClause *into, ExplainState *es,
 
 	if (es->summary && planduration)
 	{
-		int64 numCandidates = list_length(queryDesc->plannedstmt->candidatePaths);
-		ExplainPropertyInteger("Candidate plans:", "plans", numCandidates, es);
+		//int64 numCandidates = list_length(queryDesc->plannedstmt->candidatePaths);
+		//ExplainPropertyInteger("Candidate plans", "plans", numCandidates, es);
 		
 		int64 numJoins = queryDesc->plannedstmt->numJoins;
-		ExplainPropertyInteger("Candidate joins:", "joins", numJoins, es);
+		ExplainPropertyInteger("Candidate joins", "joins", numJoins, es);
 
 		double		plantime = INSTR_TIME_GET_DOUBLE(*planduration);
 

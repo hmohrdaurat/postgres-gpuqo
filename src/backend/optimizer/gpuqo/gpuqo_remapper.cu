@@ -218,6 +218,7 @@ GpuqoPlannerInfo<BitmapsetOUT> *Remapper<BitmapsetIN,BitmapsetOUT>::remapPlanner
 	info->n_rels = n_rels;
 	info->n_iters = old_info->n_iters;
     info->params = old_info->params;
+	//info->total_iters = old_info->total_iters;
 
     initGpuqoPlannerInfo(info);
 

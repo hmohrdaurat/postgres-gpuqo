@@ -146,9 +146,7 @@ public:
     pthread_t* threads;
     DependencyBuffers<BitmapsetN> depbufs;    
     ThreadArgs<BitmapsetN>* thread_args;
-#ifdef GPUQO_PROFILE
-    uint64_t total_job_count;
-#endif
+    
     PROTOTYPE_TIMING_CLASS(wait);
     PROTOTYPE_TIMING_CLASS(execute);
 
@@ -188,7 +186,7 @@ public:
     #endif
 
     #ifdef GPUQO_PROFILE
-        total_job_count++;
+        idp_current_iterations++;
     #endif 
 
         depbufs.depbuf_next->push(join_rel, &left_rel, &right_rel);
@@ -314,11 +312,11 @@ gpuqo_cpu_dpe(GpuqoPlannerInfo<BitmapsetN>* info, CPUAlgorithm<BitmapsetN, hasht
     DPEJoinFunction<BitmapsetN> join_func(info, &memo, algorithm);
 
     join_func.threads = new pthread_t[gpuqo_dpe_n_threads-1];
-    join_func.thread_args = new ThreadArgs<BitmapsetN>[gpuqo_dpe_n_threads-1];
+    join_func.thread_args = new ThreadArgs<BitmapsetN>[gpuqo_dpe_n_threads-1];    
 #ifdef GPUQO_PROFILE
-    join_func.total_job_count = 0;
+    int previous_total_iters = idp_current_iterations;
 #endif
-    
+
     join_func.depbufs.finish = false;
     join_func.depbufs.depbuf_curr = new DependencyBuffer<BitmapsetN>(info->n_rels, gpuqo_dpe_pairs_per_depbuf);
     join_func.depbufs.depbuf_next = new DependencyBuffer<BitmapsetN>(info->n_rels, gpuqo_dpe_pairs_per_depbuf);
@@ -401,7 +399,7 @@ gpuqo_cpu_dpe(GpuqoPlannerInfo<BitmapsetN>* info, CPUAlgorithm<BitmapsetN, hasht
         delete iter->second;
     }
 
-    LOG_PROFILE("%lu pairs have been evaluated\n", join_func.total_job_count);
+    LOG_PROFILE("%lu pairs have been evaluated\n", idp_current_iterations - previous_total_iters);
     
     // TODO move within class
     pthread_cond_destroy(&join_func.depbufs.avail_jobs);

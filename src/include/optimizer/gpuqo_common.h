@@ -58,6 +58,9 @@ extern int gpuqo_idp_type;
 extern int gpuqo_dplin_csg_threshold_lindp;
 extern int gpuqo_dplin_threshold_lindp;
 extern int gpuqo_dplin_threshold_idp;
+extern int qo_max_iterations;
+extern int idp_max_iterations;
+extern int idp_current_iterations;
 
 #ifdef __CUDA_ARCH__
 __host__ __device__

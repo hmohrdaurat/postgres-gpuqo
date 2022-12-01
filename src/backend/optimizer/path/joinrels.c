@@ -23,6 +23,7 @@
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"
 
+int qo_max_iterations;
 
 static void make_rels_by_clause_joins(PlannerInfo *root,
 									  RelOptInfo *old_rel,
@@ -671,6 +672,10 @@ make_join_rel(PlannerInfo *root, RelOptInfo *rel1, RelOptInfo *rel2)
 	List	   *restrictlist;
 
 	root->make_join_rel_count++;
+
+	if(qo_max_iterations > 0 && root->make_join_rel_count >= qo_max_iterations) {
+		return NULL;
+	}
 
 	/* We should never try to join two overlapping sets of rels. */
 	Assert(!bms_overlap(rel1->relids, rel2->relids));

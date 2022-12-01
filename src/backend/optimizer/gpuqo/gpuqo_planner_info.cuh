@@ -116,11 +116,15 @@ template<typename BitmapsetN>
 struct GpuqoPlannerInfo{
 	// used by cuda loader ignore it
 	unsigned int size;
+
+	// count how many iterations for early stop
+	//int total_iters;
+
 	// number of relations (tables) in the query
 	int n_rels;
 	// iters used by idp1 to stop earlier
 	int n_iters;
-
+	
 	// stuff given to the gpu, don't worry about it
 	GpuqoPlannerInfoParams params;
 	
@@ -139,10 +143,11 @@ struct GpuqoPlannerInfo{
 template<>
 struct GpuqoPlannerInfo<BitmapsetDynamic>{
 	unsigned int size;
+	//int total_iters;
 
 	int n_rels;
 	int n_iters;
-
+	
 	GpuqoPlannerInfoParams params;
 	
 	BaseRelation<BitmapsetDynamic> *base_rels;
