@@ -164,16 +164,20 @@ QueryTree<BitmapsetOuter> *gpuqo_run_idp2_rec(int gpuqo_algo,
 	level_of_rec++;
 	std::cout << "\n\t LEVEL OF REC: " << level_of_rec << std::endl;
 	
-	if(idp_max_iterations > 0 && idp_current_iterations >= idp_max_iterations) {
-		std::cout << "skip." << std::endl;
-		return goo_qt;
-	}
-
 	Remapper<BitmapsetOuter, BitmapsetInner> remapper(remap_list);
 
 	GpuqoPlannerInfo<BitmapsetInner> *new_info =remapper.remapPlannerInfo(info);
 	QueryTree<BitmapsetInner> *new_goo_qt =remapper.remapQueryTreeFwd(goo_qt);
-
+	
+	if(idp_max_iterations > 0 && idp_current_iterations >= idp_max_iterations) {
+		std::cout << "skip." << std::endl;
+		QueryTree<BitmapsetOuter> *out_qt = remapper.remapQueryTree(new_goo_qt);
+		freeGpuqoPlannerInfo(new_info);
+		freeQueryTree(new_goo_qt);
+		return out_qt;
+	} else {
+		std::cout << "continue: " << idp_current_iterations<< "/" << idp_max_iterations << std::endl;
+	}
 
 	LOG_DEBUG("--- optimizing query tree ---\n");
 	printQueryTree(new_goo_qt);

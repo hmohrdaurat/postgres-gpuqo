@@ -197,6 +197,7 @@ public:
 
 #ifdef GPUQO_PRINT_N_JOINS
                 CPUAlgorithm<BitmapsetN, memo_t>::n_checks++;
+                idp_current_iterations++;
 #endif
                 if ((left_id|right_id) == set){
                     auto &memo = *CPUAlgorithm<BitmapsetN, memo_t>::memo;

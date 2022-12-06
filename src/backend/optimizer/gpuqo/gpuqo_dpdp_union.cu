@@ -270,6 +270,18 @@ QueryTree<BitmapsetOuter> *gpuqo_run_dpdp_union_dp(int gpuqo_algo,
 
 	LOG_PROFILE("Iteration (dp) with %d rels (%d bits)\n", new_info->n_rels, BitmapsetInner::SIZE);
 	// printf("\nIteration (dp) with %d rels (%d bits)\n", new_info->n_rels, BitmapsetInner::SIZE);
+
+	if(idp_max_iterations > 0 && idp_current_iterations >= idp_max_iterations){			
+		//std::cout << "skip." << std::endl;		
+		QueryTree<BitmapsetInner> *new_goo_qt = gpuqo_cpu_goo(new_info);
+		QueryTree<BitmapsetOuter> *out_qt = remapper.remapQueryTree(new_goo_qt);
+		freeGpuqoPlannerInfo(new_info);
+		freeQueryTree(new_goo_qt);
+        return out_qt;
+	} else {
+		std::cout << "continue: " << idp_current_iterations << "/" << idp_max_iterations << std::endl;
+	}
+
 	QueryTree<BitmapsetInner> *new_qt = gpuqo_run_switch(gpuqo_algo, new_info);
 	QueryTree<BitmapsetOuter> *new_qt_remap = remapper.remapQueryTree(new_qt);
 
@@ -289,20 +301,31 @@ QueryTree<BitmapsetOuter> *gpuqo_run_dpdp_union_rec(int gpuqo_algo,
 	level_of_dp++;
 	std::cout << "\n\t LEVEL OF DP: " << level_of_dp << std::endl;
 	printf("\n f(x): gpuqo_run_dpdp_union_rec ----- FIRST CHECK ----- LEVEL %d \n", level_of_dp);
+
 	Remapper<BitmapsetOuter, BitmapsetInner> remapper(remap_list);
 	GpuqoPlannerInfo<BitmapsetInner> *new_info = remapper.remapPlannerInfo(info);
 	
 	new_info->n_iters = min(new_info->n_rels, n_iters);
 	//new_info->n_iters = min(new_info->n_rels, idp_max_iterations);
 
-	if (new_info->n_rels == new_info->n_iters || (idp_max_iterations > 0 && idp_current_iterations >= idp_max_iterations)){
+	if (new_info->n_rels == new_info->n_iters){
 		printf("\n f(x): gpuqo_run_dpdp_union_rec => -----INSIDE TERMINATION CHECK ----- LEVEL %d \n", level_of_dp);
 		QueryTree<BitmapsetOuter> *out_qt = gpuqo_run_dpdp_union_dp<BitmapsetOuter, BitmapsetInner>(gpuqo_algo, info, remap_list);
 		freeGpuqoPlannerInfo(new_info);
         return out_qt;
     }
 
-
+	if(idp_max_iterations > 0 && idp_current_iterations >= idp_max_iterations){			
+		std::cout << "skip." << std::endl;		
+		QueryTree<BitmapsetInner> *new_goo_qt = gpuqo_cpu_goo(new_info);
+		QueryTree<BitmapsetOuter> *out_qt = remapper.remapQueryTree(new_goo_qt);
+		freeGpuqoPlannerInfo(new_info);
+		freeQueryTree(new_goo_qt);
+        return out_qt;
+	} else {
+		//std::cout << "continue: " << idp_current_iterations << "/" << idp_max_iterations << std::endl;
+	}
+	
 	LeafQ<BitmapsetInner> LeafPriorityQueue;
 	EdgeQ<BitmapsetInner> EdgePriorityQueue;
 	
@@ -398,7 +421,7 @@ QueryTree<BitmapsetOuter> *gpuqo_run_dpdp_union_rec(int gpuqo_algo,
 			reopt_remap_list.push_back(list_el);
 			reopTables -= list_el.from_relid;
 		}
-	
+
 		QueryTree<BitmapsetInner> *reopt_qt;
 		if (BitmapsetInner::SIZE == 32 || reopt_remap_list.size() < 32) {
 			reopt_qt = gpuqo_run_dpdp_union_dp<BitmapsetInner, Bitmapset32>(
